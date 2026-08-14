@@ -1,0 +1,138 @@
+{
+  "$schema": "./org.config.schema.json",
+
+  "org": {
+    "name": "Acme",
+    "tagline": "one operator, four departments",
+    "atlasTitle": "Acme Org Atlas"
+  },
+
+  "//roots": "Folders you already have. init links these into vaults/<key>. Nothing is moved or copied. Use ~ for your home directory and forward slashes on every platform.",
+  "roots": {
+    "notes": "~/Documents/Notes",
+    "code": "~/Code"
+  },
+
+  "//loose": "One-off project folders that live outside the roots above. Linked into vaults/loose/<key>.",
+  "loose": {},
+
+  "//departments": "Rename, add and delete freely. id must be lowercase and filename-safe. type is one of: core (in use), tool (external connector), gap (does not exist yet). Gaps are the point: they are what the atlas draws in gold and what /review nags you about.",
+  "departments": [
+    {
+      "id": "growth",
+      "name": "Growth",
+      "sub": "audience · content",
+      "color": "#9B8CC4",
+      "mission": "Turn what you learn into things people find, and turn those people into an audience.",
+      "home": "vaults/notes/Content",
+      "ledger": "state/growth.md",
+      "note": "Replace this with the two or three facts a session keeps needing. Keep it short: this text is shown in the atlas and read at the start of every brief.",
+      "paths": [
+        "vaults/notes/Content"
+      ],
+      "clusters": [
+        {
+          "name": "Research",
+          "items": [
+            { "label": "trend-scan", "type": "core", "desc": "Whatever you use to find out what people are actually talking about.", "where": "~/.claude/skills/..." },
+            { "label": "web-search", "type": "tool", "desc": "An MCP connector for search and page extraction.", "where": "MCP connector" }
+          ]
+        },
+        {
+          "name": "Creation",
+          "items": [
+            { "label": "draft", "type": "core", "desc": "The skill that writes the thing.", "where": "~/.claude/skills/..." },
+            { "label": "post-retro", "type": "gap", "desc": "Nothing records how a piece performed after it shipped, so the loop never closes.", "where": "does not exist yet" }
+          ]
+        },
+        {
+          "name": "Ledger",
+          "items": [
+            { "label": "queue", "type": "core", "desc": "Ideas to queued to shipped, append-style.", "where": "vaults/notes/Content/Pipeline" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "product",
+      "name": "Product",
+      "sub": "what you ship",
+      "color": "#4FB88A",
+      "mission": "Ship and keep alive the things that charge money directly.",
+      "home": "vaults/code",
+      "ledger": "state/product.md",
+      "note": "Name the repos that actually make money here, and the one analytics event chain that tells you whether they do.",
+      "paths": [
+        "vaults/code"
+      ],
+      "clusters": [
+        {
+          "name": "Build",
+          "items": [
+            { "label": "your-app", "type": "core", "desc": "The main repo.", "where": "vaults/code/your-app" }
+          ]
+        },
+        {
+          "name": "Ship",
+          "items": [
+            { "label": "github", "type": "tool", "desc": "Repos, pull requests, issues, code search.", "where": "MCP connector" },
+            { "label": "incident-log", "type": "gap", "desc": "Nothing records what broke, when, or what fixed it, so every outage is diagnosed from scratch.", "where": "does not exist yet" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "revenue",
+      "name": "Revenue",
+      "sub": "offers · funnel",
+      "color": "#E3B341",
+      "mission": "Convert attention into money, and know which part of the path is doing the converting.",
+      "home": "vaults/notes/Money",
+      "ledger": "state/revenue.md",
+      "note": "The funnel as it actually runs, including the step you cannot measure. Naming the blind spot is more useful than pretending it is not there.",
+      "paths": [
+        "vaults/notes/Money"
+      ],
+      "clusters": [
+        {
+          "name": "Offer",
+          "items": [
+            { "label": "money-map", "type": "core", "desc": "One file describing the funnel and the offers. Ground every pricing answer here.", "where": "vaults/notes/Money/Money-Map.md" },
+            { "label": "pricing-test", "type": "gap", "desc": "No structured pricing experiment has been run.", "where": "does not exist yet" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "memory",
+      "name": "Memory",
+      "sub": "the vault itself",
+      "color": "#E8873C",
+      "mission": "Hold what the other departments need to remember, and hand it back on demand.",
+      "home": "vaults/notes",
+      "ledger": "state/memory.md",
+      "note": "This ledger records changes to how the vault is organised, not the content going into it.",
+      "paths": [
+        "vaults/notes"
+      ],
+      "clusters": [
+        {
+          "name": "Rules",
+          "items": [
+            { "label": "search-scoping", "type": "core", "desc": "The order a session searches in. This discipline is why exact search keeps working as the vault grows.", "where": "vaults/notes/CLAUDE.md" }
+          ]
+        },
+        {
+          "name": "Recall",
+          "items": [
+            { "label": "obsidian", "type": "tool", "desc": "Reads and writes the vault directly.", "where": "MCP connector" },
+            { "label": "weekly-digest", "type": "gap", "desc": "Nothing summarises what the vault learned this week.", "where": "run /review" }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "//mcp": "Copied verbatim into a generated .mcp.json at the org root, so a session started here has every connector. Leave empty to skip generating the file.",
+  "mcpServers": {}
+}

@@ -1,0 +1,123 @@
+{
+  "$schema": "../org.config.schema.json",
+  "//": "A one-person content business. Copy to ../org.config.json and edit the roots.",
+
+  "org": {
+    "name": "Studio",
+    "tagline": "one operator, five departments",
+    "atlasTitle": "Studio Atlas"
+  },
+
+  "roots": {
+    "notes": "~/Documents/Vault",
+    "code": "~/Code"
+  },
+
+  "loose": {},
+
+  "departments": [
+    {
+      "id": "growth",
+      "name": "Growth",
+      "sub": "audience · content",
+      "color": "#9B8CC4",
+      "mission": "Turn what you learn into posts, and posts into an audience that trusts you enough to buy.",
+      "home": "vaults/notes/Content",
+      "note": "Read the lane ledger before producing anything in that lane. That single habit is why run ten beats run one.",
+      "paths": ["vaults/notes/Content"],
+      "clusters": [
+        { "name": "Research", "items": [
+          { "label": "trend-scan", "type": "core", "desc": "Finds what people are actually talking about this month.", "where": "~/.claude/skills/..." },
+          { "label": "competitor-pull", "type": "core", "desc": "Scrapes engagement on your own posts and a peer set.", "where": "vaults/notes/Content/scripts" }
+        ]},
+        { "name": "Creation", "items": [
+          { "label": "draft", "type": "core", "desc": "Writes the post in your voice, not a generic one.", "where": "~/.claude/skills/..." },
+          { "label": "visuals", "type": "core", "desc": "Image and carousel generation.", "where": "~/.claude/skills/..." },
+          { "label": "script", "type": "gap", "desc": "No skill for short-form video scripts, which is the format posted most often. Every script starts cold.", "where": "does not exist yet" }
+        ]},
+        { "name": "Distribution", "items": [
+          { "label": "scheduler", "type": "tool", "desc": "Posts and schedules across platforms.", "where": "MCP connector" }
+        ]},
+        { "name": "Measurement", "items": [
+          { "label": "what-works", "type": "core", "desc": "Running record of the formats and hooks that land. Read before proposing anything.", "where": "vaults/notes/Content/Analytics" },
+          { "label": "post-retro", "type": "gap", "desc": "Nothing writes a retro after a post lands, so the loop closes by hand or not at all.", "where": "does not exist yet" }
+        ]}
+      ]
+    },
+    {
+      "id": "revenue",
+      "name": "Revenue",
+      "sub": "offers · funnel",
+      "color": "#E3B341",
+      "mission": "Convert attention into paid members, courses and products.",
+      "home": "vaults/notes/Money",
+      "note": "Name the step in your funnel you cannot measure. Knowing where the blind spot is beats pretending there is none.",
+      "paths": ["vaults/notes/Money"],
+      "clusters": [
+        { "name": "Offer", "items": [
+          { "label": "money-map", "type": "core", "desc": "The funnel and the offers in one file. Ground every pricing answer here.", "where": "vaults/notes/Money/Money-Map.md" },
+          { "label": "pricing-test", "type": "gap", "desc": "No structured pricing experiment has been run.", "where": "does not exist yet" }
+        ]},
+        { "name": "Convert", "items": [
+          { "label": "community", "type": "tool", "desc": "Posts into the paid community.", "where": "MCP connector" },
+          { "label": "dm-to-sale", "type": "gap", "desc": "Nothing tracks a conversation through to a purchase, so conversion is unknown.", "where": "does not exist yet" }
+        ]}
+      ]
+    },
+    {
+      "id": "labs",
+      "name": "Labs",
+      "sub": "skills · connectors",
+      "color": "#4FA8B8",
+      "mission": "Build the tooling the other departments run on.",
+      "home": "vaults/code",
+      "note": "The friction queue from every other department lands here. That combined list is the build queue.",
+      "paths": ["vaults/code"],
+      "clusters": [
+        { "name": "Author", "items": [
+          { "label": "skill-creator", "type": "core", "desc": "Creates and evaluates skills.", "where": "~/.claude/skills/..." },
+          { "label": "mcp-builder", "type": "core", "desc": "Builds connectors.", "where": "~/.claude/skills/..." }
+        ]},
+        { "name": "Audit", "items": [
+          { "label": "usage-audit", "type": "gap", "desc": "No record of which installed skills have ever run, so the list cannot be pruned honestly.", "where": "does not exist yet" }
+        ]}
+      ]
+    },
+    {
+      "id": "memory",
+      "name": "Memory",
+      "sub": "the vault",
+      "color": "#E8873C",
+      "mission": "Hold what the other departments need to remember, and hand it back on demand.",
+      "home": "vaults/notes",
+      "note": "This ledger records changes to how the vault is organised, not the content going into it.",
+      "paths": ["vaults/notes"],
+      "clusters": [
+        { "name": "Rules", "items": [
+          { "label": "search-order", "type": "core", "desc": "Project folder first, knowledge second, archive never unless asked. This is why exact search keeps working.", "where": "vaults/notes/CLAUDE.md" }
+        ]},
+        { "name": "Recall", "items": [
+          { "label": "vault-mcp", "type": "tool", "desc": "Reads and writes the vault directly.", "where": "MCP connector" },
+          { "label": "weekly-digest", "type": "gap", "desc": "Nothing summarises what the vault learned this week.", "where": "run /review" }
+        ]}
+      ]
+    },
+    {
+      "id": "self",
+      "name": "Self",
+      "sub": "body · time",
+      "color": "#C96A8E",
+      "mission": "Keep the operator running. There is one, and everything routes through them.",
+      "home": "vaults/notes/Personal",
+      "note": "When several ledgers have a bad week at once, check this one before looking for a process fix.",
+      "paths": ["vaults/notes/Personal"],
+      "clusters": [
+        { "name": "Review", "items": [
+          { "label": "weekly-review", "type": "gap", "desc": "Nothing connects a week of poor output to its cause.", "where": "run /review" }
+        ]}
+      ]
+    }
+  ],
+
+  "mcpServers": {}
+}

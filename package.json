@@ -1,0 +1,34 @@
+{
+  "name": "company-brain",
+  "version": "1.0.0",
+  "description": "A router and memory layer for AI coding sessions spread across many folders. One place to open Claude from, one ledger per department, nothing moved.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "init": "node bin/init.mjs",
+    "sync": "node bin/sync-inventory.mjs",
+    "doctor": "node bin/doctor.mjs",
+    "atlas": "node bin/serve-atlas.mjs"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "second-brain",
+    "obsidian",
+    "agents",
+    "mcp",
+    "skills",
+    "context-engineering"
+  ],
+  "files": [
+    "bin",
+    "templates",
+    "atlas",
+    ".claude",
+    "org.config.json",
+    "CLAUDE.md"
+  ]
+}

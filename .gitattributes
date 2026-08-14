@@ -1,0 +1,14 @@
+# Normalise line endings so Windows contributors do not churn every file.
+* text=auto eol=lf
+
+# These are executed by cmd.exe and need CRLF.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Shell scripts must stay LF or they will not run.
+*.sh text eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary

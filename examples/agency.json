@@ -1,0 +1,96 @@
+{
+  "$schema": "../org.config.schema.json",
+  "//": "A small services business with clients. Copy to ../org.config.json and edit the roots.",
+
+  "org": {
+    "name": "Atelier",
+    "tagline": "win it, build it, remember it",
+    "atlasTitle": "Atelier Atlas"
+  },
+
+  "roots": {
+    "clients": "~/Work/Clients",
+    "notes": "~/Documents/Vault",
+    "code": "~/Code"
+  },
+
+  "loose": {},
+
+  "departments": [
+    {
+      "id": "pipeline",
+      "name": "Pipeline",
+      "sub": "leads · pitches",
+      "color": "#5C8FD6",
+      "mission": "Keep the pipeline warm without posting into the void.",
+      "home": "vaults/notes/Pipeline",
+      "note": "Measure conversations started and calls booked. Impressions are not a pipeline metric and tracking them will make you feel productive while nothing happens.",
+      "paths": ["vaults/notes/Pipeline"],
+      "clusters": [
+        { "name": "Outbound", "items": [
+          { "label": "voice-profile", "type": "core", "desc": "Who you are, who you serve, and the phrases you never use. Maintain this above everything else.", "where": "vaults/notes/Pipeline/voice.md" },
+          { "label": "post-engine", "type": "core", "desc": "Generates and queues daily posts for review before publishing.", "where": "vaults/code/post-engine" },
+          { "label": "call-attribution", "type": "gap", "desc": "Nothing links a booked call back to the post that caused it, so you cannot tell which content sells.", "where": "does not exist yet" }
+        ]},
+        { "name": "Pitch", "items": [
+          { "label": "proposal-tpl", "type": "gap", "desc": "No proposal template, so every pitch is written from scratch under time pressure.", "where": "does not exist yet" },
+          { "label": "case-studies", "type": "core", "desc": "Proof, with numbers the client agreed to.", "where": "vaults/notes/Pipeline/cases" }
+        ]}
+      ]
+    },
+    {
+      "id": "delivery",
+      "name": "Delivery",
+      "sub": "client work",
+      "color": "#4FB88A",
+      "mission": "Ship what was sold, on the scope that was sold.",
+      "home": "vaults/clients",
+      "note": "One folder per client, flat. Scope changes get logged the day they happen, not at invoice time.",
+      "paths": ["vaults/clients", "vaults/code"],
+      "clusters": [
+        { "name": "Engagements", "items": [
+          { "label": "client-folders", "type": "core", "desc": "One per client: scope, contacts, decisions, invoices.", "where": "vaults/clients" },
+          { "label": "scope-log", "type": "gap", "desc": "Scope creep is noticed at invoice time instead of when it happens.", "where": "does not exist yet" }
+        ]},
+        { "name": "Build", "items": [
+          { "label": "starter-kit", "type": "core", "desc": "The repo every engagement forks from.", "where": "vaults/code/starter" },
+          { "label": "github", "type": "tool", "desc": "Repos, pull requests, issues.", "where": "MCP connector" }
+        ]}
+      ]
+    },
+    {
+      "id": "ops",
+      "name": "Ops",
+      "sub": "money · admin",
+      "color": "#E3B341",
+      "mission": "Invoice on time and know the margin per engagement.",
+      "home": "vaults/notes/Ops",
+      "note": "Hours against fixed price is the number that decides whether an engagement was worth taking. Record it while you remember.",
+      "paths": ["vaults/notes/Ops"],
+      "clusters": [
+        { "name": "Money", "items": [
+          { "label": "rate-card", "type": "core", "desc": "What you charge and what you stopped charging for.", "where": "vaults/notes/Ops/rates.md" },
+          { "label": "margin-per-job", "type": "gap", "desc": "Nothing records hours against fixed price, so profitability per client is a guess.", "where": "does not exist yet" }
+        ]}
+      ]
+    },
+    {
+      "id": "memory",
+      "name": "Memory",
+      "sub": "the vault",
+      "color": "#E8873C",
+      "mission": "Hold what the other departments need to remember.",
+      "home": "vaults/notes",
+      "note": "Client context is the most expensive thing to lose and the easiest to leave in a chat window.",
+      "paths": ["vaults/notes"],
+      "clusters": [
+        { "name": "Recall", "items": [
+          { "label": "vault-mcp", "type": "tool", "desc": "Reads and writes the vault directly.", "where": "MCP connector" },
+          { "label": "search-order", "type": "core", "desc": "Client folder first, knowledge second, archive never unless asked.", "where": "vaults/notes/CLAUDE.md" }
+        ]}
+      ]
+    }
+  ],
+
+  "mcpServers": {}
+}

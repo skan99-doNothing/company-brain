@@ -1,0 +1,60 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: init + doctor on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Every shipped config must be valid JSON
+        shell: bash
+        run: |
+          for f in org.config.json org.config.schema.json examples/*.json; do
+            node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))" && echo "ok   $f"
+          done
+
+      - name: Create the folders the default config points at
+        shell: bash
+        run: mkdir -p ~/Documents/Notes ~/Code
+
+      - name: init
+        run: node bin/init.mjs
+
+      - name: Re-running init must not clobber a ledger
+        shell: bash
+        run: |
+          echo "- 1999-01-01 · sentinel · must survive a re-run" >> state/growth.md
+          node bin/init.mjs --force
+          grep -q "sentinel" state/growth.md && echo "ok   ledger survived --force"
+
+      - name: sync
+        run: node bin/sync-inventory.mjs
+
+      - name: doctor
+        run: node bin/doctor.mjs
+
+      - name: Every example config must build
+        shell: bash
+        run: |
+          for f in examples/*.json; do
+            node bin/init.mjs --config "$f" --dry-run > /dev/null && echo "ok   $f"
+          done
+
+      - name: The atlas must be wired to the live config
+        run: node bin/check-atlas.mjs

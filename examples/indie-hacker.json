@@ -1,0 +1,101 @@
+{
+  "$schema": "../org.config.schema.json",
+  "//": "One person shipping software. Copy to ../org.config.json and edit the roots.",
+
+  "org": {
+    "name": "Workshop",
+    "tagline": "ship, sell, remember",
+    "atlasTitle": "Workshop Atlas"
+  },
+
+  "roots": {
+    "code": "~/Code",
+    "notes": "~/Documents/Notes"
+  },
+
+  "loose": {},
+
+  "departments": [
+    {
+      "id": "product",
+      "name": "Product",
+      "sub": "what you ship",
+      "color": "#4FB88A",
+      "mission": "Ship and keep alive the things that charge money directly.",
+      "home": "vaults/code",
+      "note": "Name the one event chain that tells you whether the product works. Instrumentation you never read is not instrumentation.",
+      "paths": ["vaults/code"],
+      "clusters": [
+        { "name": "Build", "items": [
+          { "label": "main-app", "type": "core", "desc": "The repo that makes the money.", "where": "vaults/code/main-app" },
+          { "label": "db-schema", "type": "core", "desc": "Schema design and migrations.", "where": "~/.claude/skills/..." },
+          { "label": "payments", "type": "core", "desc": "Owns the path from checkout to activation.", "where": "~/.claude/skills/..." }
+        ]},
+        { "name": "Ship", "items": [
+          { "label": "deploy", "type": "core", "desc": "Preview and production deploys.", "where": "plugin" },
+          { "label": "github", "type": "tool", "desc": "Repos, pull requests, issues, code search.", "where": "MCP connector" },
+          { "label": "changelog", "type": "core", "desc": "Release notes from commit history.", "where": "~/.claude/skills/..." }
+        ]},
+        { "name": "Verify", "items": [
+          { "label": "e2e-tests", "type": "core", "desc": "Browser tests against the running app.", "where": "plugin" },
+          { "label": "incident-log", "type": "gap", "desc": "Nothing records what broke, when, or what fixed it. Every outage is diagnosed from scratch.", "where": "does not exist yet" }
+        ]},
+        { "name": "Observe", "items": [
+          { "label": "analytics", "type": "tool", "desc": "Product analytics for the funnel events.", "where": "MCP connector" },
+          { "label": "scheduled-read", "type": "gap", "desc": "Nobody reads the funnel on a cadence, so the link between a launch and a signup is never observed.", "where": "does not exist yet" }
+        ]}
+      ]
+    },
+    {
+      "id": "growth",
+      "name": "Growth",
+      "sub": "how they find you",
+      "color": "#9B8CC4",
+      "mission": "Get the product in front of people who have the problem it solves.",
+      "home": "vaults/notes/Marketing",
+      "note": "Launches are not a channel. Write down which channel actually brought signups, or you will relaunch forever.",
+      "paths": ["vaults/notes/Marketing"],
+      "clusters": [
+        { "name": "Channels", "items": [
+          { "label": "landing-copy", "type": "core", "desc": "The page and its variants.", "where": "vaults/code/main-app/marketing" },
+          { "label": "seo", "type": "core", "desc": "Technical and content SEO.", "where": "~/.claude/skills/..." },
+          { "label": "attribution", "type": "gap", "desc": "Nothing links a signup back to where it came from.", "where": "does not exist yet" }
+        ]}
+      ]
+    },
+    {
+      "id": "revenue",
+      "name": "Revenue",
+      "sub": "pricing · retention",
+      "color": "#E3B341",
+      "mission": "Charge correctly and keep the people who pay.",
+      "home": "vaults/notes/Money",
+      "note": "Churn is a product problem wearing a finance costume. Log the reason, not just the number.",
+      "paths": ["vaults/notes/Money"],
+      "clusters": [
+        { "name": "Pricing", "items": [
+          { "label": "price-page", "type": "core", "desc": "Tiers, limits and what changed when.", "where": "vaults/notes/Money/Pricing.md" },
+          { "label": "churn-reasons", "type": "gap", "desc": "Cancellations are counted but the reason is never captured.", "where": "does not exist yet" }
+        ]}
+      ]
+    },
+    {
+      "id": "memory",
+      "name": "Memory",
+      "sub": "notes · decisions",
+      "color": "#E8873C",
+      "mission": "Hold the reasoning so you stop relitigating settled questions.",
+      "home": "vaults/notes",
+      "note": "Architecture arguments you have already had belong in decisions.md with an exit condition.",
+      "paths": ["vaults/notes"],
+      "clusters": [
+        { "name": "Recall", "items": [
+          { "label": "decision-log", "type": "core", "desc": "Why, and what would reverse it.", "where": "decisions.md" },
+          { "label": "weekly-digest", "type": "gap", "desc": "Nothing summarises the week.", "where": "run /review" }
+        ]}
+      ]
+    }
+  ],
+
+  "mcpServers": {}
+}

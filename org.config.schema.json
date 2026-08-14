@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "company-brain org config",
+  "description": "Describes an operator's departments and the folders they own. bin/init.mjs turns this into briefs, ledgers, links and an atlas.",
+  "type": "object",
+  "required": ["org", "roots", "departments"],
+  "properties": {
+    "org": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "description": "Shown in the atlas header and the generated HOME.md." },
+        "tagline": { "type": "string", "description": "One short line under the atlas title." },
+        "atlasTitle": { "type": "string", "description": "Browser tab title for the atlas. Defaults to \"<name> Org Atlas\"." }
+      }
+    },
+    "roots": {
+      "type": "object",
+      "description": "key -> absolute path. Each becomes vaults/<key> as a junction (Windows) or symlink (macOS, Linux). Supports ~ and forward slashes everywhere.",
+      "additionalProperties": { "type": "string" }
+    },
+    "loose": {
+      "type": "object",
+      "description": "key -> absolute path, for one-off folders outside the roots. Each becomes vaults/loose/<key>.",
+      "additionalProperties": { "type": "string" }
+    },
+    "departments": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "Lowercase, filename-safe. Becomes departments/<id>.md and state/<id>.md." },
+          "name": { "type": "string" },
+          "sub": { "type": "string", "description": "Two or three words under the name in the atlas." },
+          "color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$", "description": "Hex. Give each department a distinguishable hue." },
+          "mission": { "type": "string", "description": "One sentence. What this department is for." },
+          "home": { "type": "string", "description": "The single path most work in this department touches." },
+          "ledger": { "type": "string", "description": "Defaults to state/<id>.md." },
+          "note": { "type": "string", "description": "The two or three facts a session keeps needing. Shown in the atlas and read at the start of every brief." },
+          "paths": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Every folder this department owns, relative to the org root. Scanned by sync-inventory to detect drift."
+          },
+          "clusters": {
+            "type": "array",
+            "description": "Named groups of units. Drives the atlas constellation and the brief's inventory table.",
+            "items": {
+              "type": "object",
+              "required": ["name", "items"],
+              "properties": {
+                "name": { "type": "string" },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["label", "type"],
+                    "properties": {
+                      "label": { "type": "string", "description": "Keep under about 18 characters so it fits on the map." },
+                      "type": {
+                        "enum": ["core", "tool", "gap"],
+                        "description": "core = something you use, tool = an external connector, gap = does not exist yet. Gaps are drawn in gold and drive /review."
+                      },
+                      "desc": { "type": "string", "description": "One or two sentences. Shown when the orb is opened." },
+                      "where": { "type": "string", "description": "Real path, or where it would live if it is a gap." }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "mcpServers": {
+      "type": "object",
+      "description": "Copied verbatim into a generated .mcp.json at the org root. Same shape Claude Code expects.",
+      "additionalProperties": true
+    }
+  }
+}

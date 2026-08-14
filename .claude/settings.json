@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node bin/init.mjs)",
+      "Bash(node bin/init.mjs:*)",
+      "Bash(node bin/sync-inventory.mjs)",
+      "Bash(node bin/sync-inventory.mjs:*)",
+      "Bash(node bin/doctor.mjs)",
+      "Bash(npm run sync)",
+      "Bash(npm run doctor)",
+      "Bash(rg:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch)",
+      "Bash(ls:*)"
+    ],
+    "deny": [
+      "Read(./vaults/**/.env)",
+      "Read(./vaults/**/.env.*)",
+      "Read(./vaults/**/credentials.json)",
+      "Read(./vaults/**/*secret*)",
+      "Read(./.env)"
+    ]
+  }
+}
