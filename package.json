@@ -11,6 +11,7 @@
     "init": "node bin/init.mjs",
     "sync": "node bin/sync-inventory.mjs",
     "doctor": "node bin/doctor.mjs",
+    "doctor:deep": "node bin/doctor.mjs --deep",
     "atlas": "node bin/serve-atlas.mjs"
   },
   "keywords": [

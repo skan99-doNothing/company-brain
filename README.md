@@ -76,9 +76,17 @@ one over `org.config.json` if the default four departments do not fit.
 **3.** Build it.
 
 ```bash
-npm run init      # links, briefs, ledgers, dashboard, launcher
-npm run doctor    # checks everything is wired, explains anything that is not
+npm run init        # links, briefs, ledgers, dashboard, launcher
+npm run doctor      # checks everything is wired, explains anything that is not
+npm run doctor:deep # also asks every MCP server to initialize
 ```
+
+`doctor` stays offline and needs no configuration, so it is safe as the first thing a fresh
+clone runs. `doctor:deep` adds the checks that talk to something: it asks each server in
+`.mcp.json` to complete an MCP `initialize` handshake and reports the ones that do not
+answer, which is the only way to catch a connector whose token expired or whose path moved.
+A static read of `.mcp.json` cannot tell you either. Neither command repairs anything; both
+name the command that would.
 
 **4.** Open Claude from the root, using the generated launcher rather than opening Claude
 inside individual project folders. That is the whole mechanism.
