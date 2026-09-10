@@ -12,7 +12,16 @@
     "sync": "node bin/sync-inventory.mjs",
     "doctor": "node bin/doctor.mjs",
     "doctor:deep": "node bin/doctor.mjs --deep",
-    "atlas": "node bin/serve-atlas.mjs"
+    "atlas": "node bin/serve-atlas.mjs",
+    "preflight": "node bin/preflight.mjs",
+    "index": "node bin/index.mjs",
+    "search": "node bin/search.mjs",
+    "eval": "node bin/eval-search.mjs",
+    "supervise": "node bin/supervise.mjs",
+    "brain": "node bin/mcp-brain.mjs",
+    "entities": "node bin/entities.mjs",
+    "relate": "node bin/relate.mjs",
+    "db": "node bin/db.mjs"
   },
   "keywords": [
     "claude",
@@ -22,7 +31,9 @@
     "agents",
     "mcp",
     "skills",
-    "context-engineering"
+    "context-engineering",
+    "rag",
+    "pgvector"
   ],
   "files": [
     "bin",

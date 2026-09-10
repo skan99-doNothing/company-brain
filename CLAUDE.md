@@ -76,6 +76,17 @@ Agents live in `.claude/agents/`. Connectors are consolidated in `.mcp.json` at 
 generated from the `mcpServers` block in `org.config.json`, so a session started here has
 every connector the individual folders had.
 
+If the retrieval stage is set up, a `brain` server is among them and `search` is the tool to
+reach for when the question is about meaning rather than a word: "where did I write about
+pricing" rather than "find the string SENDABLE". It also exposes department state, a
+document's neighbours in the link graph, subjects that span departments, recent sessions and
+duplicate documents.
+
+Scoped ripgrep stays the first move for anything nameable. It is exact, instant, and needs no
+service running. Reach for `search` when you do not know the word you wrote, and note that it
+needs Ollama up: if retrieval fails, nothing is lost, because the notes are files and the
+index rebuilds from them in minutes.
+
 ## Prose
 
 Briefs, ledger entries and reports are prose written for a person. Keep them plain and

@@ -13,7 +13,13 @@ npm run init && npm run doctor
 ```
 
 Needs Node 18+ and [Claude Code](https://claude.com/claude-code). Works on Windows, macOS
-and Linux. No dependencies.
+and Linux. No npm dependencies, in this or in any part of it.
+
+That much is the router, and it is the whole thing for most people. There is a second stage
+if you want it, which indexes everything the router links and hands your sessions semantic
+search over it as MCP tools. It needs a Postgres database and a local embedding model, it is
+off until you set it up, and the router does not care either way. See
+[retrieval](#retrieval-the-optional-second-stage).
 
 ---
 
@@ -119,6 +125,68 @@ Two agents in `.claude/agents/`: **librarian** (find and file across the linked 
 
 ---
 
+## Retrieval, the optional second stage
+
+The router makes a session open in the right place with the right context. It cannot answer
+"where did I write about X" across forty thousand files, because ripgrep needs you to know
+the word you wrote, and six months later you remember the idea instead.
+
+This stage indexes the markdown under every linked root into Postgres with pgvector, then
+exposes retrieval to every session as MCP tools. The index is strictly derived: markdown on
+disk stays the only source of truth, and `npm run index -- --rebuild` reconstructs the whole
+thing, so a corrupted index is a repair and never a loss.
+
+**What you need.** A Postgres database with the `vector` and `pg_trgm` extensions. A
+[Supabase](https://supabase.com) project on the free tier is the assumed case and what the
+migrations are written against. And [Ollama](https://ollama.com) running locally with an
+embedding model, which is what keeps this free and keeps your notes on your own machine.
+Nothing is sent to an embedding API unless you change a variable to say so.
+
+```bash
+ollama pull mxbai-embed-large
+cp .env.example .env        # then fill in the project URL and the service key
+
+for f in supabase/migrations/*.sql; do npm run db -- apply "$f"; done
+
+npm run index               # first run embeds everything, later runs only what changed
+npm run search -- "the thing you half remember"
+```
+
+Ollama has to be running whenever a session *searches*, not only when you index, because a
+query is embedded by the same model that embedded the corpus. Vectors are only comparable to
+vectors from the same model, so switching models means `--rebuild`.
+
+**Day to day.**
+
+| Command | What it does |
+|---|---|
+| `npm run index` | Brings the index up to date. Skips a file whose content hash has not changed, so it is cheap to run often. |
+| `npm run search -- "..."` | Search from the terminal. `--why` shows which signals fired, which is how you debug a bad result. |
+| `npm run brain` | The MCP server. Add it to `.mcp.json` and every session gets search, department state, neighbours, related subjects, recent sessions and duplicates as tools. |
+| `npm run eval` | Scores retrieval against your own questions. Run `-- --audit` after anything that moves files. |
+| `npm run entities` | Builds one identity for a person, project or tool across every department that mentions it. |
+| `npm run relate` | Reports subjects that appear in several departments with nothing linking them. |
+| `npm run supervise` | Asks the questions nobody remembers to ask: what has stalled, which department has gone quiet, what is in flight that no longer exists, which subjects span departments with nothing linking them, and whether retrieval scored worse than last run. |
+| `npm run preflight` | Checks Postgres and Ollama are reachable. `bin/nightly.cmd` runs it before anything else. |
+
+**Two things that will bite you, both learned the hard way.**
+
+Never let two copies of the same file into the index. A duplicate of your own notes is worse
+than noise: it matches, it scores as correct in the eval, and it hides a real failure
+underneath. Exactly that happened here. A vendored copy of this repo's own `decisions.md`
+outranked the real one, and the eval called it a pass for weeks. Keep copies out with
+`index.exclude` in `org.config.json`. Search collapses identical text to one result as a
+backstop, but exclusion is the fix.
+
+Write your own eval questions before you tune anything. `bin/eval-questions.mjs` ships
+fifteen that target the files this template gives you, so the harness says something true on
+day one, and they are an example of the format rather than a benchmark. The rules that keep a
+set honest are in that file's header, and the one that matters most is to keep each expected
+path fragment specific: a fragment broad enough to match a whole directory is satisfied by
+anything in it, so the question passes without ever finding the answer.
+
+---
+
 ## What is in the repo
 
 ```
@@ -131,6 +199,25 @@ bin/                   init, sync-inventory, doctor, serve-atlas
 .claude/agents/        librarian, dept-analyst
 atlas/                 the visual map
 examples/              three starting configs
+```
+
+The retrieval stage, inert until you configure it:
+
+```
+.env.example           copy to .env: database URL, key, embedding model
+supabase/migrations/   schema and the search function, applied in order
+bin/lib/               config, walk, markdown, embed, store, search
+bin/index.mjs          the indexer
+bin/search.mjs         search from the terminal
+bin/mcp-brain.mjs      retrieval as MCP tools
+bin/eval-search.mjs    the scorer
+bin/eval-questions.mjs the questions, which you replace
+bin/entities.mjs       one identity per subject across departments
+bin/relate.mjs         subjects that span departments with nothing linking them
+bin/supervise.mjs      what stalled, what went quiet, what nobody wrote down
+bin/preflight.mjs      is it worth starting a scheduled run
+bin/nightly.cmd        preflight, index, eval, one summary line
+bin/db.mjs             apply a migration, run a query
 ```
 
 Generated by `npm run init`, and gitignored because they are yours, not the template's:
