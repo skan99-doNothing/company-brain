@@ -32,7 +32,7 @@ import { localEmbedder } from "./lib/embed-local.mjs";
 import { store } from "./lib/store.mjs";
 
 try { process.loadEnvFile(resolve(ROOT, ".env")); }
-catch { console.error("no .env at the org root"); process.exit(1); }
+catch { console.error('no .env at the org root. The retrieval stage is not set up: see "Retrieval" in the README.'); process.exit(1); }
 
 const argv = process.argv.slice(2);
 const flag = (name) => argv.includes(name);

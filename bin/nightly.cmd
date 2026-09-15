@@ -1,26 +1,29 @@
 @echo off
-REM Nightly refresh of the company brain.
+REM Nightly refresh of the brain.
 REM
-REM Registered as the scheduled task "Org brain nightly". Everything here is
-REM already safe to re-run: the indexer skips unchanged files on content hash,
-REM the Codex ingester skips sessions it has already stored, and the map is
-REM generated from scratch each time.
+REM Register as a scheduled task if you want the index kept current without
+REM thinking about it. Everything here is safe to re-run: the indexer skips
+REM unchanged files on content hash, the Codex ingester skips sessions it has
+REM already stored, and the map is generated from scratch each time.
 REM
-REM Order matters. Documents first so links resolve against a complete map and
+REM Order matters. Documents first, so links resolve against a complete map and
 REM the correlation rebuild averages the chunks that exist at the end. Codex
 REM sessions next, because they are independent of the document index. The eval
 REM after both, so its score describes the corpus as it now stands. The map last,
-REM since it reads every number the three steps above produced.
+REM since it reads every number the steps above produced.
 REM
-REM Preflight comes before all of it. On 9 September the run started while the
-REM machine had no DNS and every Supabase step failed in turn, so one cause left
-REM four stack traces in this log and a real bug in the Codex step hid underneath
-REM them for two days. Preflight waits for Supabase and Ollama and gives up
-REM without running anything, which leaves yesterday's index and map in place.
+REM Preflight comes first and is the whole reason this file is not just a list of
+REM npm calls. A task that fires at 3am runs on a machine that may have just
+REM woken, resumed, or not finished bringing an interface up, and every step
+REM below needs the database while the indexer also needs Ollama. Without the
+REM wait, one missing network leaves a stack trace per step, which reads as
+REM several unrelated bugs rather than one cause, and a real failure in a later
+REM step hides underneath them. Preflight waits, then gives up without running
+REM anything, so a failed night leaves yesterday's index and map in place.
 REM
-REM Every step's failure is collected and reprinted as one line at the end. The
-REM per-step [FAILED] markers were already here and nothing ever read them,
-REM because finding them meant scrolling a log that grows every night.
+REM Each step's failure is collected and reprinted as one line at the end,
+REM because a marker buried in a log that grows every night is a marker nobody
+REM reads.
 
 setlocal
 REM Point this at your own checkout, or set ORG in the environment first.

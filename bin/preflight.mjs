@@ -37,7 +37,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(fileURLToPath(new URL("../", import.meta.url)));
 
 try { process.loadEnvFile(resolve(ROOT, ".env")); }
-catch { console.error("preflight: no .env at the org root"); process.exit(1); }
+catch { console.error("preflight: " + 'no .env at the org root. The retrieval stage is not set up: see "Retrieval" in the README.'); process.exit(1); }
 
 const argv = process.argv.slice(2);
 const num = (f, d) => { const i = argv.indexOf(f); return i === -1 ? d : Number(argv[i + 1]); };

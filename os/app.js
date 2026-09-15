@@ -45,7 +45,7 @@ const TITLES = {
   chat: ["Agents", "Claude, ChatGPT and the box, all on plans you already pay for"],
   sessions: ["Sessions", "what Claude and Codex actually did"],
   dept: ["Department", ""],
-  hermes: ["Server", "your box, if you have one, and the timers on it"],
+  server: ["Server", "your box, if you have one, and the timers on it"],
   jobs: ["Jobs", "anything this window spawned"],
 };
 
@@ -191,7 +191,7 @@ async function health() {
     probe("ollama", h.ollama);
     probe("vps", h.vps);
     renderTiles(h);
-    if (current === "hermes") renderHermes(h);
+    if (current === "server") renderServer(h);
   } catch (err) {
     $("#stat-tiles").innerHTML = `<div class="card"><div class="bad">${esc(err.message)}</div></div>`;
   }
@@ -415,7 +415,7 @@ async function loadGraph(force = false) {
   }
 }
 
-/* -------------------------------------------------------------- hermes -- */
+/* -------------------------------------------------------------- server -- */
 
 /**
  * The timers you expect to be running on your box.
@@ -428,7 +428,7 @@ async function loadGraph(force = false) {
  */
 const TIMERS = [];
 
-function renderHermes(h) {
+function renderServer(h) {
   const up = h?.vps?.ok;
   $("#vps-banner").innerHTML = `
     <div class="banner ${up ? "ok" : ""}">
@@ -517,7 +517,7 @@ function load(view, force = false) {
   if (view === "chat") loadAgents();
   if (view === "sessions") loadSessions();
   if (view === "dept") renderDept();
-  if (view === "hermes") renderHermes(lastHealth);
+  if (view === "server") renderServer(lastHealth);
   if (view === "jobs") loadJobs();
 }
 

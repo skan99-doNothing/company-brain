@@ -13,8 +13,9 @@
  * the corpus moves, which is nightly. That build does not survive contact with
  * this machine.
  *
- * The seed comes from what you have already declared instead. You write
- * [[People/Some Name]] and [[10_Projects/Some Project]], so the namespace before
+ * The seed comes from what the vault already declares instead. A note that writes
+ * [[People/A Collaborator]] or [[Projects/Some Product]] has named the kind in the
+ * namespace before
  * the slash is the kind, stated by the person who knows. org.config.json names
  * every unit. A directory under vaults/code is a repository he made, and one
  * under vaults/loose/vps is a service he deployed. None of those costs a model
@@ -43,7 +44,7 @@ import { ROOT, loadConfig } from "./lib/config.mjs";
 import { store } from "./lib/store.mjs";
 
 try { process.loadEnvFile(resolve(ROOT, ".env")); }
-catch { console.error("no .env at the org root"); process.exit(1); }
+catch { console.error('no .env at the org root. The retrieval stage is not set up: see "Retrieval" in the README.'); process.exit(1); }
 
 const argv = process.argv.slice(2);
 const flag = (f) => argv.includes(f);
@@ -184,7 +185,7 @@ async function seed() {
   // vaults/loose/vps is a thing he deployed and is running. Both are the most
   // concrete declaration in the whole system, and neither was being read. They
   // come last so a name the vault already typed keeps the kind the vault gave
-  // it: the repo directory `Vibefix` does not overwrite `[[10_Projects/VibeFix]]`.
+  // it: a repo directory `myproduct` does not overwrite `[[Projects/MyProduct]]`.
   for (const [rel, kind] of [["vaults/code", "repo"], ["vaults/loose/vps", "service"]]) {
     const dir = join(ROOT, ...rel.split("/"));
     if (!existsSync(dir)) continue;

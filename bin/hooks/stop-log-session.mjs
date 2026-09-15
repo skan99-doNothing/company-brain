@@ -68,7 +68,7 @@ function loadConfig() {
 /**
  * Real filesystem paths for each department, resolved through the junctions.
  * A session's cwd is a real path like C:\Users\you\Code\someapp, while the
- * config says vaults/code/ppshop, so the link has to be followed to compare them.
+ * config says vaults/code/someapp, so the link has to be followed to compare them.
  * Longest path first, because department paths nest.
  */
 function departmentClaims(cfg) {

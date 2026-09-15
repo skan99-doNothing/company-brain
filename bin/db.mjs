@@ -25,7 +25,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 try {
   process.loadEnvFile(resolve(ROOT, ".env"));
 } catch {
-  console.error("no .env at the org root, or it could not be parsed");
+  console.error('no .env at the org root. The retrieval stage is not set up: see "Retrieval" in the README. If it exists, it could not be parsed.');
   process.exit(1);
 }
 

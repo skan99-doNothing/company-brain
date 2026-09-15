@@ -8,7 +8,7 @@
  *
  * The wikilink graph only knows what somebody typed. This asks the embeddings
  * that are already in the index, which know that the CRM notes in Product, the
- * sync service on your server and the email sequences in Growth are one
+ * service that sends for a CRM and the email sequences in another department are one
  * subject wearing three names in three departments.
  *
  * Run it after `npm run index`. It refreshes the document centroids first, so

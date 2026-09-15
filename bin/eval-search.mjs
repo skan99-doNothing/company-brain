@@ -17,11 +17,10 @@
  * the question that actually matters: does the whole stack, embedding plus
  * hybrid fusion plus weighting, put the right file in front of you.
  *
- * Every question is one you could really ask, and every expected answer is a
- * path fragment rather than a filename, so a correct answer that lives in an
+ * Every question is one you could really ask, and every expected answer is a path
+ * fragment rather than a filename, so a correct answer that lives in an
  * unexpected file still counts. Tune search_chunks against these numbers. Do not
- * tune it against one query you happen to be looking at, which is how the
- * literal-token arm got built twice and thrown away once.
+ * tune it against one query you happen to be looking at.
  */
 
 import { resolve } from "node:path";
@@ -30,7 +29,7 @@ import { brain } from "./lib/search.mjs";
 import { QUESTIONS } from "./eval-questions.mjs";
 
 try { process.loadEnvFile(resolve(ROOT, ".env")); }
-catch { console.error("no .env at the org root"); process.exit(1); }
+catch { console.error('no .env at the org root. The retrieval stage is not set up: see "Retrieval" in the README.'); process.exit(1); }
 
 const argv = process.argv.slice(2);
 const VERBOSE = argv.includes("--verbose");
