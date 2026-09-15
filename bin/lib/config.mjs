@@ -52,6 +52,10 @@ export function vaultFor(absPath) {
   const root = norm(ROOT);
   if (!p.startsWith(root + "/")) return "external";
   const rel = p.slice(root.length + 1);
+  // Shadow documents extracted from binaries under vaults/context/Assets. They
+  // are their own namespace: a hit there is a pointer to a PDF or a deck on
+  // disk, not a note someone wrote.
+  if (rel.startsWith("assets/")) return "assets";
   if (!rel.startsWith("vaults/")) return "org";
   const parts = rel.split("/");
   if (parts[1] === "loose") return "loose/" + (parts[2] ?? "");

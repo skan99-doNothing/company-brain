@@ -66,8 +66,8 @@ export function brain({ db = store(), embed = queryEmbedder() } = {}) {
    *
    * Paths are stored as Windows absolute paths with backslashes, but every
    * caller thinks in forward slashes, so both separators become the ilike
-   * wildcard. "departments/memory.md" then matches the stored absolute path
-   * whichever separator it was written with.
+   * wildcard. "departments/memory.md" then matches
+   * "C:\Users\you\Org\departments\memory.md".
    */
   const documentsUnder = (fragment, limit = 50) => {
     const pattern = String(fragment).replace(/[\\/]+/g, "*");
@@ -93,8 +93,9 @@ export function brain({ db = store(), embed = queryEmbedder() } = {}) {
    *
    * neighbours() walks the wikilink graph, which only knows what somebody wrote
    * down. This reads the correlation edges built from document centroids, which
-   * is how a CRM note in one department, a service on a server and a repo under
-   * turn out to be one subject under three names in three departments.
+   * is how the CRM notes in Product, the sync service on your server and the
+   * app under Code turn out to be one subject under three names in three
+   * departments.
    */
   const related = (documentId, k = 8) =>
     db.rest("/rpc/document_related", { method: "POST", body: { doc_id: documentId, k } });

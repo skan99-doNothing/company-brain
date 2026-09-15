@@ -4,8 +4,8 @@
  *
  *   node bin/search.mjs "why is there no vector database"
  *   node bin/search.mjs --dept capital "what did we test and park"
- *   node bin/search.mjs --k 5 "cookie auth"
- *   node bin/search.mjs --why "a client name"  show which signals fired
+ *   node bin/search.mjs --k 5 "skool cookie auth"
+ *   node bin/search.mjs --why "front2back"     show which signals fired
  *
  * The ranking itself lives in the database. This is a thin viewer over it, kept
  * so the ordering can be judged by eye before anything depends on it.
@@ -16,7 +16,7 @@ import { ROOT } from "./lib/config.mjs";
 import { brain } from "./lib/search.mjs";
 
 try { process.loadEnvFile(resolve(ROOT, ".env")); }
-catch { console.error('no .env at the org root. The retrieval stage is not set up: see "Retrieval" in the README.'); process.exit(1); }
+catch { console.error("no .env at the org root"); process.exit(1); }
 
 const argv = process.argv.slice(2);
 const take = (name, fallback = null) => {

@@ -118,6 +118,9 @@ for (const [linkPath, target, label] of links) {
 
 const tplDept = await readFile(join(ROOT, "templates", "department.md"), "utf8");
 const tplLedger = await readFile(join(ROOT, "templates", "ledger.md"), "utf8");
+const tplAgent = (await exists(join(ROOT, "templates", "agent.md")))
+  ? await readFile(join(ROOT, "templates", "agent.md"), "utf8")
+  : null;
 const today = new Date().toISOString().slice(0, 10);
 
 function fill(tpl, map) {
@@ -145,6 +148,34 @@ function clusterTable(d) {
   return out.join("\n");
 }
 
+/**
+ * Connectors this department should reach for.
+ *
+ * Taken from cluster items of type "tool", but only those that are actually
+ * declared in mcpServers. A brief can name a connector that was never wired up,
+ * and telling an agent to use something that does not exist wastes a turn and
+ * teaches it to distrust its own instructions.
+ */
+function connectorList(d, cfg) {
+  const declared = new Set(Object.keys(cfg.mcpServers ?? {}));
+  const named = (d.clusters ?? [])
+    .flatMap((cl) => (cl.items ?? []).filter((i) => i.type === "tool"))
+    .map((i) => i.label);
+
+  const live = [...new Set(named.filter((n) => declared.has(n)))];
+  const missing = [...new Set(named.filter((n) => !declared.has(n)))];
+
+  const lines = ["- `brain` for search, department state, neighbours and duplicates."];
+  for (const n of live) lines.push(`- \`${n}\``);
+  if (missing.length) {
+    lines.push(
+      `\nNamed in this department's brief but not wired up in \`.mcp.json\`, so do not ` +
+      `attempt them: ${missing.map((m) => `\`${m}\``).join(", ")}.`
+    );
+  }
+  return lines.join("\n");
+}
+
 function gapList(d) {
   const gaps = (d.clusters ?? []).flatMap((cl) => (cl.items ?? []).filter((i) => i.type === "gap"));
   if (!gaps.length) return "- Nothing outstanding.";
@@ -167,6 +198,7 @@ for (const d of cfg.departments) {
     MISSION: d.mission ?? "", HOME: d.home ?? "", LEDGER: ledgerRel,
     NOTE: d.note ?? "", DATE: today, ORG,
     PATHS: pathTable(d), CLUSTERS: clusterTable(d), GAPS: gapList(d),
+    CONNECTORS: connectorList(d, cfg),
   };
 
   const writeBrief = FORCE || !(await exists(briefPath));
@@ -178,6 +210,21 @@ for (const d of cfg.departments) {
   if (await exists(ledgerPath)) skip(`${ledgerRel}  (kept, this is your memory)`);
   else if (DRY) ok(`${ledgerRel}  ${c.dim}(would create)${c.off}`);
   else { await mkdir(dirname(ledgerPath), { recursive: true }); await writeFile(ledgerPath, fill(tplLedger, map), "utf8"); ok(ledgerRel); }
+
+  // One agent per department, generated rather than hand-written. Eight
+  // near-identical files maintained by hand drift apart within a month, and
+  // nobody notices until one of them is quietly wrong.
+  if (tplAgent) {
+    const agentPath = join(ROOT, ".claude", "agents", `${d.id}.md`);
+    const writeAgent = FORCE || !(await exists(agentPath));
+    if (!writeAgent) skip(`.claude/agents/${d.id}.md  (exists, use --force to rewrite)`);
+    else if (DRY) ok(`.claude/agents/${d.id}.md  ${c.dim}(would write)${c.off}`);
+    else {
+      await mkdir(dirname(agentPath), { recursive: true });
+      await writeFile(agentPath, fill(tplAgent, map), "utf8");
+      ok(`.claude/agents/${d.id}.md`);
+    }
+  }
 }
 
 /* ------------------------------------------------------------------- HOME */

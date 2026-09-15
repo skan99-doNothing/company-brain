@@ -22,6 +22,7 @@ const SKIP = new Set([
   ".git", "node_modules", ".venv", "venv", "anaconda3", "__pycache__", ".next", ".nuxt",
   "dist", "build", "out", ".turbo", ".cache", ".parcel-cache", "coverage", ".pytest_cache",
   ".mypy_cache", ".ipynb_checkpoints", "target", "vendor", "Pods", ".obsidian", ".svelte-kit",
+  ".playwright-mcp", ".docx_temp", "_dupes-review",
 ]);
 
 const c = { dim: "\x1b[2m", red: "\x1b[31m", yel: "\x1b[33m", off: "\x1b[0m" };

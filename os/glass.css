@@ -1,0 +1,327 @@
+/*
+ * Liquid glass, done with light rather than with blur.
+ *
+ * Most "glassmorphism" is one backdrop-filter and a white border at 20 percent.
+ * That reads as frosted plastic. Real glass does four things at once, and all
+ * four are cheap:
+ *
+ *   refraction   what is behind bends, so the background has to move and have
+ *                structure worth bending. Hence the aurora field below.
+ *   specular     a bright rim where light grazes the edge, brightest on the
+ *                top-left, gone by the bottom-right. One gradient border.
+ *   depth        the panel sits above its shadow, and the shadow is tinted by
+ *                the surface under it rather than being neutral black.
+ *   grain        perfectly smooth gradients read as CGI. A little noise is what
+ *                makes a surface look like a material.
+ *
+ * Palette is deliberately not the cyan every AI assistant ships with. Deep
+ * violet ground, champagne light. It should look like an expensive object.
+ */
+
+/* ------------------------------------------------------------- tokens -- */
+
+:root {
+  color-scheme: dark;
+
+  /* Ground. Never pure black: glass over #000 has nothing to refract. */
+  --ink-000: #07060d;
+  --ink-050: #0b0a14;
+  --ink-100: #12101f;
+  --ink-200: #1a1729;
+
+  /* The two lights in the room. */
+  --gold-100: #f6e6c4;
+  --gold-200: #e8c88a;
+  --gold-300: #c9a663;
+  --violet-100: #b9aef0;
+  --violet-200: #8b7fd4;
+  --violet-300: #5f55a3;
+
+  /* Text sits on glass, so it needs more contrast than it looks like it does. */
+  --text: #ece9f5;
+  --text-dim: #a49fc0;
+  --text-faint: #6f6a8c;
+
+  --good: #7fd6a8;
+  --warn: #e8c88a;
+  --bad: #e8798a;
+
+  /* Glass surface. Alpha, not colour: the tint comes from what is behind. */
+  --glass-fill: rgba(255, 255, 255, 0.075);
+  --glass-fill-hi: rgba(255, 255, 255, 0.12);
+  --glass-edge: rgba(255, 255, 255, 0.14);
+  --glass-blur: 28px;
+
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+
+  /* Concentric radii: an inner corner must be the outer radius minus the gap,
+     or the two curves fight each other. */
+  --pad: 14px;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Goes a little past the target and settles back. The difference between a
+     panel resizing and something opening. */
+  --spring: cubic-bezier(0.16, 1.24, 0.3, 1);
+
+  --font: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Consolas, monospace;
+}
+
+/* --------------------------------------------------------------- base -- */
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--ink-000);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* The field the glass refracts.
+ *
+ * Three slow radial gradients on their own timings, so the composite never
+ * repeats on a period you can see. Fixed, behind everything, and it is the
+ * reason the panels look like glass instead of grey boxes. */
+.field {
+  position: fixed;
+  inset: -20%;
+  z-index: -2;
+  background:
+    radial-gradient(46% 42% at 16% 18%, rgba(139, 127, 212, 0.62), transparent 68%),
+    radial-gradient(38% 40% at 88% 62%, rgba(201, 166, 99, 0.20), transparent 66%),
+    radial-gradient(54% 52% at 62% 96%, rgba(109, 92, 205, 0.50), transparent 68%),
+    radial-gradient(34% 34% at 40% 60%, rgba(78, 70, 150, 0.38), transparent 70%),
+    var(--ink-000);
+  filter: blur(34px) saturate(150%);
+  animation: drift 44s var(--ease-soft) infinite alternate;
+}
+
+@keyframes drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(2.5%, -2%, 0) scale(1.07); }
+  100% { transform: translate3d(-2%, 2.5%, 0) scale(1.03); }
+}
+
+/* Grain. An SVG turbulence data URI rather than a PNG so there is no asset to
+   ship and nothing to 404. Screen blend keeps it in the highlights, where film
+   grain actually lives. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field { animation: none; }
+}
+
+/* -------------------------------------------------------------- glass -- */
+
+/*
+ * .glass is the one surface primitive. Everything else is a size of it.
+ *
+ * The specular rim is a border-image rather than a border colour, because a
+ * flat border is the single clearest tell of fake glass: real light falls off
+ * around the edge. 135deg puts the bright end top-left, which is where the
+ * aurora is brightest, so the lighting is at least internally consistent.
+ */
+.glass {
+  position: relative;
+  background: var(--glass-fill);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border-radius: var(--r-md);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 12px 40px -12px rgba(10, 6, 26, 0.75);
+}
+
+/* The rim. Separate element so it can sit above the backdrop-filter without
+   being blurred by it, which is what happens if you put it on the border. */
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.42) 0%,
+    rgba(255, 255, 255, 0.10) 28%,
+    rgba(255, 255, 255, 0.02) 55%,
+    rgba(201, 166, 99, 0.16) 100%
+  );
+  /* Masking the fill away leaves only the 1px ring. */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* A caustic: the bright smear glass throws onto itself near the top edge. */
+.glass--lit::after {
+  content: "";
+  position: absolute;
+  inset: 1px 1px auto 1px;
+  height: 45%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent);
+  pointer-events: none;
+}
+
+.glass--hi { background: var(--glass-fill-hi); }
+
+.glass--flush {
+  border-radius: 0;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.06);
+}
+.glass--flush::before { display: none; }
+
+/* ------------------------------------------------------------ refract -- */
+
+/*
+ * Actual refraction, for the few elements worth the cost.
+ *
+ * feTurbulence generates a noise field and feDisplacementMap uses it to push
+ * pixels around, which is what a rippled surface does to what is behind it.
+ * It is expensive enough that it belongs on the accent surfaces and command bar
+ * and nowhere else; on a full page of panels it drops frames.
+ */
+.refract {
+  filter: url(#liquid);
+}
+
+/* ------------------------------------------------------------ motion -- */
+
+/* Glass has surface tension: it should settle, not snap. */
+.lift {
+  transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease),
+              background 0.3s var(--ease-soft);
+}
+.lift:hover {
+  transform: translateY(-2px);
+  background: var(--glass-fill-hi);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    0 22px 60px -16px rgba(10, 6, 26, 0.85);
+}
+
+/* --------------------------------------------------------- typography -- */
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.dim { color: var(--text-dim); }
+.faint { color: var(--text-faint); }
+.good { color: var(--good); }
+.warn { color: var(--warn); }
+.bad  { color: var(--bad); }
+
+/* --------------------------------------------------------- components -- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.chip--good { color: var(--good); border-color: rgba(127, 214, 168, 0.28); background: rgba(127, 214, 168, 0.10); }
+.chip--warn { color: var(--warn); border-color: rgba(232, 200, 138, 0.28); background: rgba(232, 200, 138, 0.10); }
+.chip--bad  { color: var(--bad);  border-color: rgba(232, 121, 138, 0.28); background: rgba(232, 121, 138, 0.10); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.25s var(--ease-soft), transform 0.4s var(--ease);
+}
+.btn:hover { background: rgba(255, 255, 255, 0.12); }
+.btn:active { transform: scale(0.97); }
+.btn--gold {
+  background: linear-gradient(180deg, var(--gold-100), var(--gold-300));
+  color: #2a1f06;
+  font-weight: 500;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 6px 20px -6px rgba(201, 166, 99, 0.6);
+}
+.btn--gold:hover { filter: brightness(1.06); background: linear-gradient(180deg, var(--gold-100), var(--gold-300)); }
+
+.rule { height: 1px; background: rgba(255, 255, 255, 0.07); border: 0; margin: 0; }
+
+/* Scrollbars, because the default light-on-dark one ruins the whole effect. */
+* { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.14) transparent; }
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); background-clip: content-box; }
+
+::selection { background: rgba(232, 200, 138, 0.28); }
+
+/* Focus: visible, and in the accent, not the browser's blue. */
+:focus-visible {
+  outline: 2px solid var(--gold-200);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

@@ -187,10 +187,10 @@ if (await exists(join(ROOT, ".mcp.json"))) {
  *
  * A server is configured correctly when its command exists, its arguments point
  * at real files, and it completes an `initialize` handshake. Only the third
- * proves anything. A server on cookie auth works until the cookie expires, a
- * server launched from a path in another repo breaks when that repo moves, and
- * an http endpoint answers 401 the moment its token is wrong. All three look
- * perfectly fine in a static read of .mcp.json.
+ * proves anything: skool runs on a cookie that expires, tradingview points at a
+ * path in another repo that can move, and the github entry here is an http
+ * endpoint that answers 400 the moment its token is malformed. All three look
+ * fine in a static read of .mcp.json.
  *
  * Windows needs shell:true to launch npx at all, which means arguments carry
  * their own quotes, and killing the shell would otherwise orphan the node
